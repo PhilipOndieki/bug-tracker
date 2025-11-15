@@ -26,6 +26,8 @@ const corsOptions = {
   credentials: true,
 };
 
+app.options('*', cors(corsOptions));
+
 // Rate Limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000, // 15 minutes
