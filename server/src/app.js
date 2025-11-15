@@ -24,8 +24,6 @@ const corsOptions = {
   credentials: true,
 };
 
-app.options('*', cors(corsOptions));
-
 // Security Middleware
 app.use(helmet());
 
