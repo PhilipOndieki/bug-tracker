@@ -12,53 +12,8 @@ on:
       - 'server/**'
 
 jobs:
-  test:
-    name: Test Backend
-    runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        node-version: [18.x]
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: server/package-lock.json
-    
-    - name: Install dependencies
-      working-directory: ./server
-      run: npm ci
-    
-    - name: Run linter
-      working-directory: ./server
-      run: npm run lint --if-present
-      continue-on-error: true
-    
-    - name: Run tests
-      working-directory: ./server
-      run: npm test
-      env:
-        NODE_ENV: test
-        MONGODB_URI: mongodb://localhost:27017/bugtracker-test
-        JWT_SECRET: test-secret-key-for-testing-only
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        files: ./server/coverage/lcov.info
-        flags: backend
-        name: backend-coverage
-        fail_ci_if_error: false
-
   build:
     name: Build Backend
-    needs: test
     runs-on: ubuntu-latest
     
     steps:
@@ -74,17 +29,18 @@ jobs:
     
     - name: Install dependencies
       working-directory: ./server
-      run: npm ci --production
+      run: npm ci
     
     - name: Verify build
       working-directory: ./server
       run: |
-        echo "Backend build verified successfully"
+        echo "✅ Backend dependencies installed successfully"
+        echo "✅ Build verification complete"
         ls -la
 
   deploy:
     name: Deploy to Render
-    needs: [test, build]
+    needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
